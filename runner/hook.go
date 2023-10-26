@@ -7,7 +7,7 @@ import (
 	"github.com/thienhaole92/vnd/firebase"
 	"github.com/thienhaole92/vnd/logger"
 	"github.com/thienhaole92/vnd/mongo"
-	"github.com/thienhaole92/vnd/postgre"
+	"github.com/thienhaole92/vnd/postgres"
 	"github.com/thienhaole92/vnd/redis"
 )
 
@@ -115,30 +115,30 @@ func FirebaseHook(rn *Runner) error {
 	return nil
 }
 
-func PostgreHook(rn *Runner) error {
+func PostgresHook(rn *Runner) error {
 	log := logger.GetLogger("PostgreHook")
 	defer log.Sync()
 
-	config, err := postgre.NewConfig()
+	config, err := postgres.NewConfig()
 	if err != nil {
 		return err
 	}
 
 	log.Infow("loaded postgre db config")
 
-	db, err := postgre.NewPostgre(config)
+	db, err := postgres.NewPostgres(config)
 	if err != nil {
 		return err
 	}
 	log.Infow("postgres connected")
 
-	rn.GetInfra().SetPostgre(db)
+	rn.GetInfra().SetPostgres(db)
 
 	shutdown := func(rn *Runner) error {
 		log := logger.GetLogger("AddShutdownHook")
 		defer log.Sync()
 
-		mg, err := rn.GetInfra().Postgre()
+		mg, err := rn.GetInfra().Postgres()
 		if err != nil {
 			return err
 		}

@@ -25,6 +25,8 @@ type Config struct {
 	Port         int           `env:"REST_SERVER_PORT" envDefault:"8080"`
 	ReadTimeout  time.Duration `env:"REST_SERVER_READ_TIMEOUT,required"`
 	WriteTimeout time.Duration `env:"REST_SERVER_WRITE_TIMEOUT,required"`
+	EnableCors   bool          `env:"REST_ENABLE_CORS" envDefault:"false"`
+	BodyLimit    string        `env:"REST_BODY_LIMIT" envDefault:"8K"`
 }
 
 func NewConfig() (*Config, error) {

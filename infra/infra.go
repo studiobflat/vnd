@@ -5,14 +5,14 @@ import (
 
 	"github.com/thienhaole92/vnd/firebase"
 	"github.com/thienhaole92/vnd/mongo"
-	"github.com/thienhaole92/vnd/postgre"
+	"github.com/thienhaole92/vnd/postgres"
 	"github.com/thienhaole92/vnd/redis"
 )
 
 type Infra struct {
 	redis    *redis.Redis
 	mongo    *mongo.Mongo
-	postgre  *postgre.Postgre
+	postgres *postgres.Postgres
 	firebase *firebase.Firebase
 }
 
@@ -52,14 +52,14 @@ func (i *Infra) SetFirebase(f *firebase.Firebase) {
 	i.firebase = f
 }
 
-func (i *Infra) Postgre() (*postgre.Postgre, error) {
-	if i.postgre == nil {
+func (i *Infra) Postgres() (*postgres.Postgres, error) {
+	if i.postgres == nil {
 		return nil, errors.New("postgres client is not set")
 	}
 
-	return i.postgre, nil
+	return i.postgres, nil
 }
 
-func (i *Infra) SetPostgre(p *postgre.Postgre) {
-	i.postgre = p
+func (i *Infra) SetPostgres(p *postgres.Postgres) {
+	i.postgres = p
 }

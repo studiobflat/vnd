@@ -1,0 +1,66 @@
+basePath: /v1
+definitions:
+  error.Error:
+    properties:
+      code:
+        type: integer
+      message: {}
+    type: object
+  rest.DocResult-string:
+    properties:
+      data:
+        type: string
+      pagination:
+        $ref: '#/definitions/rest.Pagination'
+      requestId:
+        type: string
+    type: object
+  rest.Pagination:
+    properties:
+      total:
+        type: integer
+    type: object
+host: localhost:7080
+info:
+  contact:
+    email: developer@example.com
+    name: REST API developer
+  description: This is a sample server celler server.
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /get-success/{id}:
+    get:
+      description: Gets success description.
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Return data
+          schema:
+            $ref: '#/definitions/rest.DocResult-string'
+        "400":
+          description: Error object
+          schema:
+            $ref: '#/definitions/error.Error'
+      security:
+      - Bearer: []
+      summary: Get success
+      tags:
+      - get
+swagger: "2.0"
+tags:
+- description: Get methods demo
+  name: get

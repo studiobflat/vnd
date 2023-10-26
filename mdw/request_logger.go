@@ -36,7 +36,7 @@ func RequestLogger(log *zap.Logger, extraLogFieldExtractor ...LogFieldExtractor)
 			}
 
 			if id, ok := c.Get(RequestIDContextKey).(string); ok && id != "" {
-				fields = append(fields, zap.String("trace_id", id))
+				fields = append(fields, zap.String("request_id", id))
 			}
 
 			if len(extraLogFieldExtractor) > 0 {

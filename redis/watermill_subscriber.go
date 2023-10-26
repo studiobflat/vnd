@@ -41,8 +41,6 @@ func (r *WatermillSubscriber) Start() {
 
 	log.With("topic", r.sub.Topic())
 
-	ctx := context.Background()
-
 	log.Infow("subscription start...")
 	messages, err := r.sub.Subscribe(context.Background(), r.sub.Topic())
 	if err != nil {
@@ -66,7 +64,7 @@ func (r *WatermillSubscriber) Start() {
 			continue
 		}
 
-		if err := r.consumeMessage(ctx, message); err != nil {
+		if err := r.consumeMessage(context.Background(), message); err != nil {
 			log.Panicw("subscription error, fail to consume the message", "error", err, "topic", r.sub.Topic())
 			r.Close()
 			return

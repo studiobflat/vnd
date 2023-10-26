@@ -13,6 +13,7 @@ import (
 	"github.com/thienhaole92/vnd/msrv"
 	"github.com/thienhaole92/vnd/rest"
 	"github.com/thienhaole92/vnd/rvd"
+	"github.com/thienhaole92/vnd/vndcontext"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -20,8 +21,14 @@ import (
 	"github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func buildRestServer(rn *Runner, rsh RestServerHook) (*echo.Echo, error) {
+func buildRestServer(c *esrv.Config, rn *Runner, rsh RestServerHook) (*echo.Echo, error) {
 	e := echo.New()
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			cc := &vndcontext.VContext{Context: c}
+			return next(cc)
+		}
+	})
 
 	e.HideBanner = true
 	e.Validator = rvd.DefaultRestValidator()
@@ -29,7 +36,11 @@ func buildRestServer(rn *Runner, rsh RestServerHook) (*echo.Echo, error) {
 
 	e.Pre(echoprometheus.NewMiddleware(""))
 	e.Use(mdw.RequestLogger(logger.GetLogger("request_info").Desugar(), rest.RestLogFieldExtractor))
-	e.Use(middleware.BodyLimit("8K"))
+	e.Use(middleware.BodyLimit(c.BodyLimit))
+
+	if c.EnableCors {
+		e.Use(middleware.CORS())
+	}
 
 	root := e.Group("")
 	if err := rsh(rn, e, root); err != nil {
@@ -47,7 +58,7 @@ func BuildRestServerOption(rsh RestServerHook) RunnerOption {
 		}
 		rn.log.Infow("loaded service server config", "config", c)
 
-		e, err := buildRestServer(rn, rsh)
+		e, err := buildRestServer(c, rn, rsh)
 		if err != nil {
 			return err
 		}

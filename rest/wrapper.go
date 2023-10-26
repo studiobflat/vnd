@@ -9,17 +9,18 @@ import (
 	"github.com/labstack/echo/v4"
 	vnderror "github.com/thienhaole92/vnd/error"
 	"github.com/thienhaole92/vnd/logger"
-	"github.com/thienhaole92/vnd/mdw"
+	"github.com/thienhaole92/vnd/vndcontext"
 )
 
 const RequestObjectContextKey = "service_requestObject"
 
-func Wrapper[TREQ any](wrapped func(echo.Context, *TREQ) (*Result, error)) echo.HandlerFunc {
+func Wrapper[TREQ any](wrapped func(vndcontext.VndContext, *TREQ) (*Result, error)) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log := logger.GetLogger("Wrapper")
 		defer log.Sync()
 
-		requestId := c.Get(mdw.RequestIDContextKey)
+		vndc := c.(*vndcontext.VContext)
+		requestId := vndc.RequestId()
 		handler := runtime.FuncForPC(reflect.ValueOf(wrapped).Pointer()).Name()
 		log.Infow("request begin",
 			"request_id", requestId,
@@ -31,17 +32,29 @@ func Wrapper[TREQ any](wrapped func(echo.Context, *TREQ) (*Result, error)) echo.
 		var req TREQ
 		if err := c.Bind(&req); err != nil {
 			log.Errorw("fail to bind request", "request_uri", c.Request().RequestURI, "err", err)
-			return &vnderror.Error{CustomCode: -40001, HTTPError: &echo.HTTPError{Code: http.StatusBadRequest, Message: "invalid request"}}
+			return &vnderror.Error{
+				CustomCode: -40001,
+				HTTPError: &echo.HTTPError{
+					Code:    http.StatusBadRequest,
+					Message: "invalid request",
+				},
+			}
 		}
 
 		if err := c.Validate(&req); err != nil {
 			log.Errorw("fail to validate request", "request_uri", c.Request().RequestURI, "request_object", req, "err", err)
-			return &vnderror.Error{CustomCode: -40002, HTTPError: &echo.HTTPError{Code: http.StatusBadRequest, Message: "invalid request"}}
+			return &vnderror.Error{
+				CustomCode: -40002,
+				HTTPError: &echo.HTTPError{
+					Code:    http.StatusBadRequest,
+					Message: "invalid request",
+				},
+			}
 		}
 
 		c.Set(RequestObjectContextKey, req)
 
-		res, err := wrapped(c, &req)
+		res, err := wrapped(vndc, &req)
 		if err != nil {
 			return err
 		}
@@ -50,13 +63,7 @@ func Wrapper[TREQ any](wrapped func(echo.Context, *TREQ) (*Result, error)) echo.
 		if status != 0 {
 			log.Infow("request end", "request_id", requestId, "at", time.Now().Format(time.RFC3339), "status", status)
 
-			return c.JSON(
-				status,
-				Result{
-					Data:       &res.Data,
-					Pagination: res.Pagination,
-				},
-			)
+			return c.JSON(status, res)
 		}
 
 		log.Infow("request end", "request_id", requestId, "at", time.Now().Format(time.RFC3339), "status", http.StatusOK)
