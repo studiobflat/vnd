@@ -17,8 +17,8 @@ func (e *Error) Error() string {
 	return fmt.Sprintf("CustomCode=%d, %s", e.CustomCode, e.HTTPError.Error())
 }
 
-func InternalServerError(err error) Error {
-	return Error{
+func InternalServerError(err error) error {
+	return &Error{
 		CustomCode: -50011,
 		HTTPError: &echo.HTTPError{
 			Code:     http.StatusInternalServerError,
@@ -28,8 +28,8 @@ func InternalServerError(err error) Error {
 	}
 }
 
-func BadRequest(err error) Error {
-	return Error{
+func BadRequest(err error) error {
+	return &Error{
 		CustomCode: -40011,
 		HTTPError: &echo.HTTPError{
 			Code:     http.StatusBadRequest,
