@@ -6,7 +6,7 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.2.0
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/georgysavva/scany/v2 v2.0.0
-	github.com/golang-migrate/migrate/v4 v4.15.0-beta.1
+	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/jackc/pgx-zap v0.0.0-20221202020421-94b1cb2f889f
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/labstack/gommon v0.4.0
@@ -16,7 +16,7 @@ require (
 	github.com/redis/go-redis/v9 v9.2.1
 	go.mongodb.org/mongo-driver v1.12.1
 	go.uber.org/zap v1.26.0
-	google.golang.org/api v0.103.0
+	google.golang.org/api v0.106.0
 )
 
 require (
@@ -39,6 +39,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect

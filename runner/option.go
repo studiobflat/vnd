@@ -18,7 +18,7 @@ import (
 
 	"database/sql"
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/golang-migrate/migrate/v4/database/pgx/v5"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
@@ -154,7 +154,7 @@ func BuildPostgresDatabaseMigrationHook(mh MigrationHook) RunnerOption {
 		if err != nil {
 			return err
 		}
-		driver, err := postgres.WithInstance(db, &postgres.Config{})
+		driver, err := pgx.WithInstance(db, &pgx.Config{})
 		if err != nil {
 			return err
 		}

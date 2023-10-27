@@ -124,10 +124,17 @@ func PostgresHook(rn *Runner) error {
 		return err
 	}
 
-	log.Infow("loaded postgre db config")
+	log.Infow("loaded postgres db config")
 
 	db, err := postgres.NewPostgres(config)
 	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*20))
+	defer cancel()
+
+	if err := db.Ping(ctx); err != nil {
 		return err
 	}
 	log.Infow("postgres connected")
