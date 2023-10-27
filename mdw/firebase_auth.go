@@ -1,14 +1,20 @@
 package mdw
 
 import (
+	"context"
+	"net/http"
+	"strings"
+
 	"firebase.google.com/go/auth"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"net/http"
-	"strings"
 )
 
-func FirebaseAuth(skipper middleware.Skipper, auth *auth.Client) echo.MiddlewareFunc {
+type AuthProvider interface {
+	VerifyIDTokenAndCheckRevoked(ctx context.Context, idToken string) (*auth.Token, error)
+}
+
+func FirebaseAuth(skipper middleware.Skipper, auth AuthProvider) echo.MiddlewareFunc {
 	fbauth := func(next echo.HandlerFunc) echo.HandlerFunc {
 		handler := func(c echo.Context) error {
 			if skipper(c) {
@@ -27,8 +33,7 @@ func FirebaseAuth(skipper middleware.Skipper, auth *auth.Client) echo.Middleware
 				return echo.NewHTTPError(http.StatusUnauthorized, "Invalid authorization token")
 			}
 
-			ctx := c.Request().Context()
-			token, err := auth.VerifyIDTokenAndCheckRevoked(ctx, bearerToken[1])
+			token, err := auth.VerifyIDTokenAndCheckRevoked(req.Context(), bearerToken[1])
 			if err != nil {
 				return echo.ErrUnauthorized
 			}

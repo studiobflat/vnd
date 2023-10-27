@@ -2,6 +2,7 @@ package vndcontext
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ import (
 type VndContext interface {
 	RequestContext() context.Context
 	RequestId() string
+	UserId() (string, error)
 }
 
 type VContext struct {
@@ -28,4 +30,13 @@ func (c *VContext) RequestId() string {
 	}
 
 	return ""
+}
+
+func (c *VContext) UserId() (string, error) {
+	id := c.Get(mdw.UserIDContextKey)
+	if id != nil && reflect.TypeOf(id).Name() == "string" {
+		return id.(string), nil
+	}
+
+	return "", fmt.Errorf(`user id not found`)
 }

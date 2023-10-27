@@ -10,6 +10,7 @@ import (
 
 func main() {
 	options := []runner.RunnerOption{
+		runner.NewInfraHookOption("firebase", runner.FirebaseHook),
 		runner.BuildMonitorServerOption(runner.DefaultMonitorEchoHook),
 		runner.BuildRestServerOption(restServiceHook),
 	}
