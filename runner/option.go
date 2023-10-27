@@ -16,9 +16,10 @@ import (
 	"github.com/thienhaole92/vnd/vndcontext"
 	"go.uber.org/zap/zapcore"
 
+	"database/sql"
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	"github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
 
@@ -149,17 +150,19 @@ func BuildPostgresDatabaseMigrationHook(mh MigrationHook) RunnerOption {
 			return err
 		}
 
-		f := &file.File{}
-		d, err := f.Open(source)
+		db, err := sql.Open("postgres", dbUri)
 		if err != nil {
-			log.Errorw("failed to open migration source", "error", err)
+			return err
+		}
+		driver, err := postgres.WithInstance(db, &postgres.Config{})
+		if err != nil {
 			return err
 		}
 
-		m, err := migrate.NewWithSourceInstance(
-			"database_migration",
-			d,
-			dbUri,
+		m, err := migrate.NewWithDatabaseInstance(
+			source,
+			"postgres",
+			driver,
 		)
 		if err != nil {
 			log.Errorw("failed to init migrate source", "error", err)
