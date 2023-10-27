@@ -19,6 +19,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
 )
 
 func buildRestServer(c *esrv.Config, rn *Runner, rsh RestServerHook) (*echo.Echo, error) {
@@ -138,9 +139,9 @@ func DefaultMonitorEchoHook(rn *Runner, e *echo.Echo) error {
 	return nil
 }
 
-func BuildDatabaseMigrationHook(mh MigrationHook) RunnerOption {
+func BuildPostgresDatabaseMigrationHook(mh MigrationHook) RunnerOption {
 	hook := func(rn *Runner) error {
-		log := logger.GetLogger("BuildDatabaseMigrationHook")
+		log := logger.GetLogger("BuildPostgresDatabaseMigrationHook")
 		defer log.Sync()
 
 		source, dbUri, err := mh()

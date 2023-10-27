@@ -5,12 +5,15 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/thienhaole92/vnd/logger"
+	"github.com/thienhaole92/vnd/postgres"
 	"github.com/thienhaole92/vnd/runner"
 )
 
 func main() {
 	options := []runner.RunnerOption{
+		runner.NewInfraHookOption("postgres_db", runner.PostgresHook),
 		runner.NewInfraHookOption("firebase", runner.FirebaseHook),
+		runner.BuildPostgresDatabaseMigrationHook(migrateDatabaseHook),
 		runner.BuildMonitorServerOption(runner.DefaultMonitorEchoHook),
 		runner.BuildRestServerOption(restServiceHook),
 	}
@@ -30,4 +33,15 @@ func restServiceHook(rn *runner.Runner, e *echo.Echo, eg *echo.Group) error {
 	}
 
 	return nil
+}
+
+func migrateDatabaseHook() (string, string, error) {
+	c, err := postgres.NewConfig()
+	if err != nil {
+		return "", "", err
+	}
+
+	source := "file://db/migrations"
+	databaseURL := c.Url
+	return source, databaseURL, nil
 }
