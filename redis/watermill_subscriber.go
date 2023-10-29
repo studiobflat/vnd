@@ -59,7 +59,7 @@ func (r *WatermillSubscriber) Start() {
 
 		message := <-messages
 
-		if message.UUID == "" {
+		if message == nil || message.UUID == "" {
 			log.Debugw("empty message id", "topic", r.sub.Topic())
 			continue
 		}
@@ -85,10 +85,10 @@ func (r *WatermillSubscriber) consumeMessage(ctx context.Context, msg *message.M
 
 	log.Debugw("consume message start")
 	if err := r.consumeFunc(ctx, event.EventString(string(msg.Payload))); err != nil {
+		msg.Ack()
 		return err
 	}
 
 	msg.Ack()
-
 	return nil
 }
