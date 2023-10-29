@@ -65,9 +65,8 @@ func (r *WatermillSubscriber) Start() {
 		}
 
 		if err := r.consumeMessage(context.Background(), message); err != nil {
-			log.Panicw("subscription error, fail to consume the message", "error", err, "topic", r.sub.Topic())
-			r.Close()
-			return
+			log.Errorw("subscription error, fail to consume the message", "error", err, "topic", r.sub.Topic())
+			continue
 		}
 	}
 }
