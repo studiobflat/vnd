@@ -10,6 +10,7 @@ import (
 )
 
 type VndContext interface {
+	echo.Context
 	RequestContext() context.Context
 	RequestId() string
 	UserId() (string, error)
