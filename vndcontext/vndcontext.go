@@ -25,9 +25,17 @@ func (c *VContext) RequestContext() context.Context {
 }
 
 func (c *VContext) RequestId() string {
+	rid := ""
 	id := c.Get(mdw.RequestIDContextKey)
 	if id != nil && reflect.TypeOf(id).Name() == "string" {
-		return id.(string)
+		rid = id.(string)
+		return rid
+	}
+
+	id = c.Get(echo.HeaderXRequestID)
+	if id != nil && reflect.TypeOf(id).Name() == "string" {
+		rid = id.(string)
+		return rid
 	}
 
 	return ""

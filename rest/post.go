@@ -1,19 +1,35 @@
 package rest
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
-	"io"
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	vnderror "github.com/thienhaole92/vnd/error"
+	"io"
+	"net/http"
 )
 
-func Get[RES any](ctx context.Context, requestId string, url string, heades map[string]string) (*RES, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
+func Post[RES any](ctx context.Context, requestId string, url string, heades map[string]string, body any) (*RES, error) {
+	var req *http.Request
+
+	if body != nil {
+		buf := new(bytes.Buffer)
+		if err := json.NewEncoder(buf).Encode(body); err != nil {
+			return nil, err
+		}
+
+		r, err := http.NewRequestWithContext(ctx, http.MethodPost, url, buf)
+		if err != nil {
+			return nil, err
+		}
+		req = r
+	} else {
+		r, err := http.NewRequestWithContext(ctx, http.MethodPost, url, nil)
+		if err != nil {
+			return nil, err
+		}
+		req = r
 	}
 
 	for k, v := range heades {
